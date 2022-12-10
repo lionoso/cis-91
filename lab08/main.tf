@@ -1,6 +1,6 @@
 
 variable "credentials_file" { 
-  default = "/home/sco8528/cis-91-362621-a1faeb91e089.json" 
+  default = "/home/sco8528/cis-91-362621-226cc7cd7f08.json" 
 }
 
 variable "project" {
@@ -57,7 +57,7 @@ resource "google_compute_firewall" "default-firewall" {
   network = google_compute_network.vpc_network.name
   allow {
     protocol = "tcp"
-    ports = ["22", "80"]
+    ports = ["22", "80", "3000", "5000"]
   }
   source_ranges = ["0.0.0.0/0"]
 }
