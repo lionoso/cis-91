@@ -56,6 +56,23 @@ resource "google_compute_instance" "vm_instance" {
     device_name = "lab09"
   }
 
+service_account {
+    email  = google_service_account.lab08-service-account.email
+    scopes = ["cloud-platform"]
+  }
+
+
+}
+
+resource "google_service_account" "lab08-service-account" {
+  account_id   = "lab08-service-account"
+  display_name = "lab08-service-account"
+  description = "Service account for lab 08"
+}
+
+resource "google_project_iam_member" "project_member" {
+  role = "roles/owner"
+  member = "serviceAccount:${google_service_account.lab08-service-account.email}"
 }
 
 resource "google_compute_firewall" "default-firewall" {
@@ -77,6 +94,26 @@ resource "google_compute_disk" "lab09" {
   size = "100"
 }
 
+data "google_iam_policy" "admin" {
+  binding {
+    role = "roles/storage.admin"
+    members = [
+      "serviceAccount:lab08-service-account@cis-91-362621.iam.gserviceaccount.com",
+    ]
+  }
+}
+
+resource "google_storage_bucket" "auto-expire" {
+  name ="bucketname424242"
+  location ="US"
+  force_destroy = true
+}
+
+
+resource "google_storage_bucket_iam_policy" "policy" {
+  bucket = "bucketname424242"
+  policy_data = data.google_iam_policy.admin.policy_data
+}
 output "external-ip" {
   value = google_compute_instance.vm_instance.network_interface[0].access_config[0].nat_ip
 }
